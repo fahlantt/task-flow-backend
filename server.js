@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv'; // ✅ Tambahkan ini
 import authRoutes from './routes/authRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
@@ -7,14 +8,16 @@ import reminderRoutes from './routes/reminderRoutes.js';
 import importantDateRoutes from './routes/importantDateRoutes.js';
 import './db.js';
 
+dotenv.config(); // ✅ Load semua variabel dari .env
+
 const app = express();
 
-// ✅ Gunakan port dari environment (Render) atau default ke 3001 saat lokal
+// ✅ Gunakan PORT dari environment (Render) atau fallback ke 3001 saat lokal
 const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Ganti ke URL frontend Render jika sudah deploy
+  origin: process.env.CLIENT_URL || 'http://localhost:5173', // 🔁 Ubah agar bisa pakai URL frontend online
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
