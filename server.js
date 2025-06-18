@@ -22,7 +22,9 @@ const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://task-flow-frontend-s315-cwrqy1bvy-fahlantts-projects.vercel.app'
+  'https://task-flow-frontend-s315.vercel.app',
+  'https://task-flow-frontend-s315-git-main-fahlantts-projects.vercel.app',
+  'https://task-flow-frontend-s315-9r00bgrb9-fahlantts-projects.vercel.app'
 ];
 
 app.use(cors({
