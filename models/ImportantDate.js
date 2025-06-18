@@ -1,4 +1,5 @@
 import { DataTypes } from 'sequelize';
+import sequelize from '../db.js'; // ✅ WAJIB: koneksi Sequelize
 import User from './User.js';
 
 const ImportantDate = sequelize.define('ImportantDate', {
@@ -8,7 +9,7 @@ const ImportantDate = sequelize.define('ImportantDate', {
     autoIncrement: true,
   },
   date: {
-    type: DataTypes.DATEONLY, // hanya tanggal tanpa waktu
+    type: DataTypes.DATEONLY,
     allowNull: false,
   },
   description: {
@@ -19,17 +20,17 @@ const ImportantDate = sequelize.define('ImportantDate', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: User, // model yang dirujuk
+      model: User,
       key: 'id',
     },
-    onDelete: 'CASCADE', // kalau user dihapus, data juga ikut terhapus
-  }
+    onDelete: 'CASCADE',
+  },
 }, {
   tableName: 'important_dates',
   timestamps: true,
 });
 
-// Definisikan relasi
+// 🔗 Relasi antar tabel
 User.hasMany(ImportantDate, { foreignKey: 'userId', as: 'importantDates' });
 ImportantDate.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 

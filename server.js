@@ -1,14 +1,23 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
+dotenv.config();
+
 import authRoutes from './routes/authRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
 import importantDateRoutes from './routes/importantDateRoutes.js';
-import './db.js';
+
+// Import koneksi Sequelize dan semua model
+import sequelize from './db.js';
+import './models/User.js';
+import './models/Note.js';
+import './models/Task.js';
+import './models/Reminder.js';
+import './models/ImportantDate.js';
 
 const app = express();
-
 const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = [
@@ -18,7 +27,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function(origin, callback) {
-    // izinkan kalau origin tidak ada (misal tools seperti Postman) atau termasuk dalam allowedOrigins
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -42,10 +50,19 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/reminders', reminderRoutes);
 app.use('/api/important-dates', importantDateRoutes);
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'API endpoint tidak ditemukan' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
-});
+// 🔧 Sinkronisasi Sequelize (otomatis buat tabel)
+sequelize.sync({ alter: true })
+  .then(() => {
+    console.log('✅ Semua tabel berhasil disinkronkan');
+    app.listen(PORT, () => {
+      console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ Gagal menyinkronkan database:', err);
+  });

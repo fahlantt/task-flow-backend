@@ -1,7 +1,7 @@
 // backend/routes/noteRoutes.js
 import express from 'express';
 import db from '../db.js';
-import authenticateToken from '../middleware/authMiddleware.js';
+import authenticateToken from '../middleware/authenticateToken.js';
 
 const router = express.Router();
 

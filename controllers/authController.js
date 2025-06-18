@@ -1,65 +1,32 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import db from '../db.js';
+import User from '../models/User.js';
 
-const secretKey = 'rahasia';
-
-// === REGISTER ===
 export const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
-
-  if (!username || !email || !password) {
-    return res.status(400).json({ message: 'Semua field wajib diisi' });
-  }
+  const { email, password } = req.body;
 
   try {
-    const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (existing.length > 0) {
-      return res.status(400).json({ message: 'Email sudah terdaftar' });
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email sudah terdaftar!' });
     }
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    await db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [
-      username,
-      email,
-      hashedPassword,
-    ]);
-
-    res.status(200).json({ message: 'Registrasi berhasil!' });
-  } catch (err) {
-    console.error('Error saat registrasi:', err);
-    res.status(500).json({ message: 'Gagal menyimpan user', error: err.message });
+    const newUser = await User.create({ email, password });
+    res.status(201).json({ message: 'User berhasil dibuat!', user: newUser });
+  } catch (error) {
+    res.status(500).json({ message: 'Gagal registrasi', error: error.message });
   }
 };
 
-// === LOGIN ===
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email dan password wajib diisi' });
-  }
-
   try {
-    const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    const user = users[0];
-
-    if (!user) {
-      return res.status(401).json({ message: 'Email tidak ditemukan' });
+    const user = await User.findOne({ where: { email } });
+    if (!user || !(await user.validPassword(password))) {
+      return res.status(400).json({ message: 'Email atau password salah!' });
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Password salah' });
-    }
-
-    const token = jwt.sign({ id: user.id, email: user.email }, secretKey, {
-      expiresIn: '1h',
-    });
-
-    res.status(200).json({ token, message: 'Login berhasil' });
+    res.status(200).json({ message: 'Login berhasil!', token: 'sample-jwt-token' });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Terjadi kesalahan saat login' });
+    res.status(500).json({ message: 'Gagal login', error: error.message });
   }
 };

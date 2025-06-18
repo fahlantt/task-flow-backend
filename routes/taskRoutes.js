@@ -1,7 +1,7 @@
 // backend/routes/taskRoutes.js
 import express from 'express';
 import db from '../db.js';
-import authenticateToken from '../middleware/authMiddleware.js';
+import authenticateToken from '../middleware/authenticateToken.js';
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.get('/', authenticateToken, async (req, res) => {
   const userId = req.user.id;
   try {
     const [rows] = await db.execute(
-      'SELECT id, text, is_completed, created_at FROM tasks WHERE user_id = ? ORDER BY created_at DESC',
+      'SELECT id, title, is_completed, created_at FROM tasks WHERE user_id = ? ORDER BY created_at DESC',
       [userId]
     );
     res.json(rows);
@@ -23,20 +23,20 @@ router.get('/', authenticateToken, async (req, res) => {
 // Tambah task baru
 router.post('/', authenticateToken, async (req, res) => {
   const userId = req.user.id;
-  const { text } = req.body;
+  const { title } = req.body;
 
-  if (!text || text.trim() === '') {
-    return res.status(400).json({ error: 'Teks tugas tidak boleh kosong' });
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: 'Judul tugas tidak boleh kosong' });
   }
 
   try {
     const [result] = await db.execute(
-      'INSERT INTO tasks (user_id, text) VALUES (?, ?)',
-      [userId, text.trim()]
+      'INSERT INTO tasks (user_id, title) VALUES (?, ?)',
+      [userId, title.trim()]
     );
 
     const [newTaskRows] = await db.execute(
-      'SELECT id, text, is_completed, created_at FROM tasks WHERE id = ?',
+      'SELECT id, title, is_completed, created_at FROM tasks WHERE id = ?',
       [result.insertId]
     );
 
@@ -47,16 +47,16 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Update teks tugas
+// Update judul tugas
 router.put('/:id', authenticateToken, async (req, res) => {
   const userId = req.user.id;
   const { id } = req.params;
-  const { text } = req.body;
+  const { title } = req.body;
 
   try {
     const [result] = await db.execute(
-      'UPDATE tasks SET text = ? WHERE id = ? AND user_id = ?',
-      [text, id, userId]
+      'UPDATE tasks SET title = ? WHERE id = ? AND user_id = ?',
+      [title, id, userId]
     );
 
     if (result.affectedRows === 0) {

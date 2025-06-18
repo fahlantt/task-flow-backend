@@ -1,6 +1,9 @@
-import mysql from 'mysql2/promise';
+import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const db = await mysql.createConnection(process.env.DATABASE_URL);
-export default db;
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'mysql',
+});
+
+export default sequelize;
