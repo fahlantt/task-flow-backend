@@ -4,33 +4,44 @@ import authRoutes from './routes/authRoutes.js';
 import noteRoutes from './routes/noteRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
-import importantDateRoutes from './routes/importantDateRoutes.js'; // <== tambahkan ini setelah deklarasi express
+import importantDateRoutes from './routes/importantDateRoutes.js';
 import './db.js';
 
-const app = express(); // <== pastikan deklarasi app ada sebelum app.use
+const app = express();
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://task-flow-frontend-s315-cwrqy1bvy-fahlantts-projects.vercel.app'
+];
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function(origin, callback) {
+    // izinkan kalau origin tidak ada (misal tools seperti Postman) atau termasuk dalam allowedOrigins
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
+
 app.use(express.json());
 
-// Route default
 app.get('/', (req, res) => {
   res.send('Selamat datang di aplikasi Task Flow!');
 });
 
-// Gunakan route
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/reminders', reminderRoutes);
-app.use('/api/important-dates', importantDateRoutes); // ✅ Tambahkan ini setelah deklarasi app
+app.use('/api/important-dates', importantDateRoutes);
 
-// Error handling
 app.use((req, res) => {
   res.status(404).json({ message: 'API endpoint tidak ditemukan' });
 });
