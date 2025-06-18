@@ -1,13 +1,17 @@
+// models/ImportantDate.js
 import { DataTypes } from 'sequelize';
 import sequelize from '../db.js';
-import User from './User.js';
 
 const ImportantDate = sequelize.define('ImportantDate', {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: { model: User, key: 'id' }
+    // ⛔ Jangan gunakan references: { model: User } di sini untuk hindari circular import
   },
   date: {
     type: DataTypes.DATEONLY,
@@ -21,8 +25,5 @@ const ImportantDate = sequelize.define('ImportantDate', {
   tableName: 'important_dates',
   timestamps: true,
 });
-
-// ✅ Cukup relasi ini saja
-ImportantDate.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 export default ImportantDate;

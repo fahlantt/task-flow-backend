@@ -11,6 +11,7 @@ import importantDateRoutes from './routes/importantDateRoutes.js';
 
 // Import koneksi Sequelize dan semua model
 import sequelize from './db.js';
+import './models/associations.js';
 import './models/User.js';
 import './models/Note.js';
 import './models/Task.js';
