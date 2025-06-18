@@ -28,6 +28,7 @@ const allowedOrigins = [
   'https://task-flow-frontend-s315-9r00bgrb9-fahlantts-projects.vercel.app'
 ];
 
+// ✅ PATCH ditambahkan ke daftar method yang diizinkan
 app.use(cors({
   origin: function(origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -36,7 +37,7 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
