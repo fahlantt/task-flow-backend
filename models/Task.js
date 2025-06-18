@@ -1,28 +1,41 @@
-import Task from '../models/Task.js';
+import { DataTypes } from 'sequelize';
+import sequelize from '../db.js';
+import User from './User.js';
 
-const createTask = async (req, res) => {
-  try {
-    const { title, due_date } = req.body;
-    const userId = req.user.id;
+const Task = sequelize.define('Task', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  dueDate: { // ✅ Ini penting!
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+  },
+  is_completed: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id',
+    },
+    onDelete: 'CASCADE',
+  },
+}, {
+  tableName: 'tasks',
+  timestamps: true,
+});
 
-    const task = await Task.create({ userId, title, dueDate: due_date });
-    res.status(201).json(task);
-  } catch (err) {
-    res.status(500).json({ message: 'Gagal membuat tugas', error: err.message });
-  }
-};
+// Relasi
+User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
+Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-const getTasksByUser = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const tasks = await Task.findAll({
-      where: { userId },
-      order: [['dueDate', 'ASC']],
-    });
-
-    res.json(tasks);
-  } catch (err) {
-    res.status(500).json({ message: 'Gagal mengambil tugas', error: err.message });
-  }
-};
+export default Task;
