@@ -1,12 +1,13 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../db.js'; // ✅ WAJIB: koneksi Sequelize
+import sequelize from '../db.js';
 import User from './User.js';
 
 const ImportantDate = sequelize.define('ImportantDate', {
-  id: {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  userId: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+    allowNull: false,
+    references: { model: User, key: 'id' }
   },
   date: {
     type: DataTypes.DATEONLY,
@@ -15,23 +16,13 @@ const ImportantDate = sequelize.define('ImportantDate', {
   description: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
-  },
+  }
 }, {
   tableName: 'important_dates',
   timestamps: true,
 });
 
-// 🔗 Relasi antar tabel
-User.hasMany(ImportantDate, { foreignKey: 'userId', as: 'importantDates' });
+// ✅ Cukup relasi ini saja
 ImportantDate.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 export default ImportantDate;
