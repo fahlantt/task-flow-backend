@@ -33,3 +33,5 @@ router.get('/', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Gagal ambil pengingat' });
   }
 });
+
+export default router; // ✅ Tambahkan ini
