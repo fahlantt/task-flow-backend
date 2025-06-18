@@ -23,13 +23,20 @@ const User = sequelize.define('User', {
   timestamps: true,
 });
 
-// Hash password sebelum disimpan
+// 🔒 Hash password sebelum create & update
 User.beforeCreate(async (user) => {
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
 });
 
-// Method untuk validasi password
+User.beforeUpdate(async (user) => {
+  if (user.changed('password')) {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+  }
+});
+
+// 🔑 Method validasi password
 User.prototype.validPassword = async function(password) {
   return await bcrypt.compare(password, this.password);
 };
