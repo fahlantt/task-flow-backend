@@ -1,0 +1,18 @@
+# Jangan upload environment variable
+.env
+
+# Jangan upload folder dependencies
+node_modules/
+
+# File log dan cache
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Folder output build (kalau ada)
+dist/
+build/
+
+# Sequelize migration logs (opsional)
+*.sqlite
