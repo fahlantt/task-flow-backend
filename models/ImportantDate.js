@@ -11,7 +11,7 @@ const ImportantDate = sequelize.define('ImportantDate', {
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    // ⛔ Jangan gunakan references: { model: User } di sini untuk hindari circular import
+    
   },
   date: {
     type: DataTypes.DATEONLY,
